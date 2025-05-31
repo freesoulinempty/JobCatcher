@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# JobCatcher Project Overview
+
+## Project Description
+JobCatcher is an AI-powered intelligent job search and matching platform focused on the German job market, driven by Claude 4 Sonnet. The platform utilizes AI-native capabilities to minimize code development while maximizing intelligent automation.
+
+## Core Technology Stack
+
+### AI Engine
+- **Claude 4 Sonnet** - Primary AI model with hybrid reasoning mode
+- **LangChain** (0.3.25+) - LLM application development framework  
+- **Vector Search** - RAG (Retrieval Augmented Generation) for job matching
+
+### Backend Stack
+- **FastAPI** (0.115.0+) - High-performance web framework
+- **Pydantic** (2.7.0+) - Data validation and settings management
+- **SQLite** - User session storage with aiosqlite
+- **Chroma** - Vector database for job data storage
+- **APScheduler** - Task scheduling for data crawling
+
+### Frontend Stack
+- **HTML5** - Semantic structure
+- **CSS3** - Modern styling with Grid/Flexbox layout  
+- **JavaScript ES6+** - Interactive logic and API calls
+- **Responsive Design** - Desktop/tablet/mobile support
+- **Google OAuth** - User authentication
+
+### Data Sources
+- **Apify LinkedIn Scraper** - Real-time job data from LinkedIn.de
+- **Zyte API** - Job data from Indeed.de
+- **Cost Estimate** - €5/month for data crawling
+
+## Project Structure
+The main project files are organized as:
+- [README.md](mdc:README.md) - Project documentation and requirements
+- backend/ - FastAPI backend application
+- frontend/ - HTML/CSS/JS frontend application
+
+## Key Requirements
+1. All interface language: **English**
+2. Code comments: **Chinese and English bilingual**  
+3. No test breakpoints - all work in main flow
+4. Backend startup: `cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
+5. Follow README strictly - no additional features beyond description
+6. Solve version issues rather than creating simplified versions

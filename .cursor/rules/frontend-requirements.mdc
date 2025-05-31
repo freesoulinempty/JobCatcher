@@ -1,0 +1,63 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Frontend Development Rules
+
+## UI Layout Design
+
+### Main Interface Structure
+- **Google OAuth 2.0 Login Page** - Entry point after login
+- **50%:50% Left-Right Split Layout**:
+  - **Left Side - Job Display Area**:
+    - Job search bar and city search bar (same row)
+    - Job data display area below (job cards with scroll)
+    - Display job info: title, company, location, work type, job link, description
+    - Click "show detail" to expand current job card
+    - Click job to jump to external job detail link
+  - **Right Side - AI Chat Area**:
+    - Smart chat box with resume upload and AI conversation (streaming output)
+    - Real-time resume analysis results and optimization suggestions
+    - Support skills heatmap generation and job consultation
+
+### UI Design Requirements
+- **Interface Language**: All UI text in **English**
+- **Design Style**: Clean and refreshing interface
+- **Visual Effects**: Artistic gradients and animations, floating effects
+- **Responsive Design**: Adapt to various devices
+
+## Frontend Implementation
+
+### User Authentication
+- Google OAuth 2.0 login integration
+- User session management
+- Login state maintenance
+
+### Job Search Interface
+- Job search bar and city search bar layout (same row)
+- Job card display component
+- Job detail expand/collapse functionality
+- External link jump handling
+- Vertical scroll loading
+
+### AI Chat Interface
+- File upload component (support PDF/DOC/TXT)
+- Streaming conversation output
+- Message history records
+- Skills heatmap display
+
+## File Organization
+Frontend files should be organized in the frontend/ directory with clear separation of:
+- HTML structure files
+- CSS styling files  
+- JavaScript logic files
+- Asset files (images, fonts, etc.)
+
+## Development Standards
+1. Use semantic HTML5 elements
+2. Modern CSS3 with Grid/Flexbox for layout
+3. ES6+ JavaScript for interactivity
+4. Responsive design principles
+5. Clean, maintainable code structure
+6. All comments in Chinese and English

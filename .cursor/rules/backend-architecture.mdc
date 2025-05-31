@@ -1,0 +1,93 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Backend Architecture Rules
+
+## Core API Interfaces
+
+### 1. User Authentication APIs
+- Google OAuth verification
+- User session management  
+- Login state checking
+
+### 2. Job Search APIs
+- Job keyword + city search
+- Search result return
+- Real-time crawling with Apify LinkedIn scraper (25 jobs per search)
+
+### 3. Resume Processing APIs
+- File upload handling (PDF/DOC/TXT)
+- Resume parsing with Claude 4 native capabilities
+- Vector storage in Chroma
+
+### 4. AI Chat APIs
+- Streaming conversation response
+- Claude 4 Sonnet integration
+- Skills heatmap generation
+
+## Data Source Integration
+
+### Apify LinkedIn Scraper
+- **Actor ID**: `valig/linkedin-jobs-scraper`
+- **Real-time crawling**: 25 jobs per user search (relevance-based)
+- **Scheduled crawling**: Daily 4 AM, predefined jobs: "engineer","manager","IT","Finance","Sales","Nurse"
+- **Cost**: €0.005/call (25 jobs); Monthly scheduled: €0.9/month
+- **API Documentation**: https://docs.apify.com/api/client/python/docs/overview/introduction
+
+### Zyte API Indeed Scraper
+- **Scheduled crawling**: Daily 4 AM, predefined jobs: "Web","cloud","AI","Data","software"
+- **Cost**: €0.001/call, €4/month estimated
+- **API Documentation**: https://docs.zyte.com/zyte-api/usage/reference.html
+- **Process**: First crawl job lists, then crawl job details (async processing needed)
+
+## Data Storage Architecture
+
+### SQLite Database
+- User session storage
+- User authentication information management
+- Local deployment friendly
+
+### Chroma Vector Database  
+- Vector storage and retrieval of job data
+- Resume vectorization storage
+- Similarity matching queries
+- Deduplication mechanism
+
+### Data Cleaning Mechanism
+- **Scheduled cleaning**: Daily 2 AM check all job URLs in Chroma, clean invalid URLs
+- **Zombie job cleaning**: Clean job data older than 14 days
+
+## Core Business Workflows
+
+### User Search Flow
+1. User searches "job title" + "location" on main page
+2. Apify LinkedIn scraper gets 25 jobs
+3. Data parsing → vectorization → store in Chroma (deduplication)
+4. Backend uses "job title" + "location" vector as query, retrieve most similar jobs from Chroma
+5. Send to frontend for display
+
+### Resume Recommendation Flow
+1. User uploads resume → frontend accepts → backend receives and sends to agent
+2. Agent uses Claude 4 native capabilities to parse PDF, extract key info (location, skills, education, experience, languages)
+3. Embedding vectorization → store in Chroma (deduplication)
+4. User resume vector info as query, retrieve 25 most similar jobs from Chroma
+5. Backend sends Claude 4 generated resume analysis + Chroma matched job data as prompt
+6. Backend sends prompt to Claude for job analysis and ranking
+7. Frontend bot sends message, backend gets Claude 4 ranked job data
+8. Frontend displays jobs in left panel (by matching score, top to bottom)
+
+## Environment Setup
+**Correct Backend Startup**: 
+```bash
+cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+## Development Standards
+1. All API endpoints follow RESTful design
+2. Comprehensive error handling and logging
+3. Rate limiting and security measures
+4. Bilingual comments (Chinese and English)
+5. Check port occupation before service startup, kill processes if needed
+6. Set correct PYTHONPATH environment

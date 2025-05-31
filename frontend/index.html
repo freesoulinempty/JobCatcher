@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobCatcher - AI-Powered Job Search Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="google-signin-client_id" content="523100555640-bijsrbk8cip5rkv4npprach6ui5c3l44.apps.googleusercontent.com">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading JobCatcher...</p>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginScreen" class="login-page">
+        <div class="login-container">
+            <div class="logo-section">
+                <h1 class="logo">JobCatcher</h1>
+                <p class="tagline">AI-Powered Job Search for Germany</p>
+            </div>
+            
+            <div class="login-content">
+                <h2>Welcome to Your Career Journey</h2>
+                <p>Find your perfect job match with AI-driven insights</p>
+                
+                <div class="google-login-btn" id="googleLoginBtn">
+                    <i class="fab fa-google"></i>
+                    <span>Continue with Google</span>
+                </div>
+                
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-search"></i>
+                        <span>Smart Job Search</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-robot"></i>
+                        <span>AI Resume Analysis</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Skill Insights</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="main-app hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="app-logo">JobCatcher</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User Avatar">
+                    <span id="userName" class="user-name"></span>
+                    <button id="logoutBtn" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Job Listings -->
+            <div class="left-panel">
+                <!-- Search Section -->
+                <div class="search-section">
+                    <div class="search-row">
+                        <div class="search-input-group">
+                            <i class="fas fa-briefcase"></i>
+                            <input type="text" id="jobTitle" placeholder="Job title, keywords..." class="search-input">
+                        </div>
+                        <div class="search-input-group">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" id="location" placeholder="City, location..." class="search-input">
+                        </div>
+                        <button id="searchBtn" class="search-btn">
+                            <i class="fas fa-search"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Job Results -->
+                <div class="job-results">
+                    <div class="results-header">
+                        <h3>Job Opportunities</h3>
+                        <span id="resultsCount" class="results-count">0 jobs found</span>
+                    </div>
+                    
+                    <div id="jobsContainer" class="job-list">
+                        <!-- Job cards will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - AI Chat -->
+            <div class="right-panel">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <h3>
+                        <i class="fas fa-robot"></i>
+                        AI Career Assistant
+                    </h3>
+                    <div class="chat-status">
+                        <span class="status-indicator online"></span>
+                        Online
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chatMessages" class="chat-messages">
+                    <div class="welcome-message">
+                        <div class="bot-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <p>Hello! I'm your AI career assistant powered by Claude 4 Sonnet. 👋</p>
+                            <p>Upload your resume to get personalized job recommendations and career insights!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-section">
+                    <!-- File Upload Area -->
+                    <div id="fileUploadArea" class="file-upload-area">
+                        <div class="upload-content">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop your resume here</p>
+                            <p class="upload-hint">Supports PDF, DOC, TXT files</p>
+                            <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" hidden>
+                            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                                Choose File
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input-container">
+                        <div class="input-wrapper">
+                            <textarea id="chatInput" placeholder="Ask me about jobs, skills, or career advice..." 
+                                    rows="1"></textarea>
+                            <button id="sendBtn" class="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Detail Modal -->
+    <div id="jobModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalJobTitle"></h3>
+                <button class="close-btn" onclick="closeJobModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="job-meta">
+                    <span class="company" id="modalCompany"></span>
+                    <span class="location" id="modalLocation"></span>
+                    <span class="work-type" id="modalWorkType"></span>
+                </div>
+                <div class="job-description" id="modalDescription"></div>
+                <div class="modal-actions">
+                    <button class="apply-btn" id="modalApplyBtn">
+                        <i class="fas fa-external-link-alt"></i>
+                        Apply Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/jobs.js"></script>
+</body>
+</html> 

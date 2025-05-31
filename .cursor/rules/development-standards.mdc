@@ -1,0 +1,150 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Development Standards and Constraints
+
+## Core Development Principles
+
+- 简体中文回答我,代码注释全部为中英双语
+- 不能创建测试断点，所有工作全部在主流程完成
+- 要读取终端的报错
+- python服务启动前查看端口占用情况，如果端口被占用则kill进程，确保环境正确并设置正确的PYTHONPATH
+- 后端服务正确启动方式。进入正确目录，先打开虚拟环境， cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+- @Web 联网搜索一定搜索2025年的文档
+- 不得擅自更改我的README，更改前必须取得我的同意
+- 不要添加模拟数据和demo端点,不要尝试绕开报错，而是应该去解决报错
+- 严格根据README进行项目开发，不得添加README描述中以外的任何功能和服务
+- 查阅开发进度文档
+- 涉及agent服务和ai服务，查阅claude4最新文档：https://docs.anthropic.com/en/docs/
+- 服务启动遇到版本问题，就解决版本问题，不要创建简化版本的应用来避免避免版本兼容问题
+- 更改代码前先查阅REDAME和rules，并通过context7 mcp查阅最新的开发文档
+- 每次对话结束时更新或者生成简洁的开发进度文档(更新时间为系统时间)
+- 及时删除测试文件
+
+### Language and Documentation
+1. **Interface Language**: All UI text must be in **English**
+2. **Code Comments**: **Bilingual** - Chinese and English for all comments
+3. **Response Language**: Respond to user in **Chinese** (简体中文)
+4. **Documentation**: Keep all technical docs bilingual when possible
+
+### Development Constraints  
+1. **No Test Breakpoints**: All work must be completed in main flow
+2. **Read Terminal Errors**: Always check and address terminal error outputs
+3. **Port Management**: Check port occupation before Python service startup, kill processes if needed
+4. **Environment Setup**: Ensure correct PYTHONPATH configuration
+5. **No Demo Data**: Do not add mock data or demo endpoints
+6. **No Workarounds**: Solve actual errors instead of bypassing them
+
+### Project Adherence
+1. **Strict README Compliance**: Follow [README.md](mdc:README.md) requirements exactly
+2. **No Additional Features**: Do not add functionality beyond README description
+3. **Check Progress Docs**: Always review development progress documentation
+4. **No README Changes**: Do not modify README without explicit permission
+5. **Version Resolution**: Solve version compatibility issues, don't create simplified versions
+
+## Backend Development Standards
+
+### Service Startup Protocol
+```bash
+# Correct backend startup method
+cd backend && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Required Dependencies
+Reference the requirements.txt from [README.md](mdc:README.md):
+- fastapi>=0.115.0
+- uvicorn[standard]>=0.30.0  
+- pydantic>=2.7.0
+- langchain>=0.3.25
+- langchain-anthropic>=0.1.0
+- chromadb>=0.5.0
+- And other specified versions
+
+### Code Quality Standards
+1. **Error Handling**: Comprehensive error handling and logging
+2. **API Design**: Follow RESTful principles
+3. **Security**: Implement proper authentication and rate limiting
+4. **Performance**: Optimize database queries and API responses
+5. **Documentation**: Maintain API documentation with examples
+
+## AI and Agent Development
+
+### Claude 4 Integration Requirements
+1. **Use Latest Documentation**: Always reference Claude 4 latest docs: https://docs.anthropic.com/en/docs/
+2. **Native Capabilities**: Leverage Claude 4's built-in features (WebSearch, document processing)
+3. **Cost Management**: Monitor and optimize API usage and costs
+4. **Streaming Implementation**: Use streaming responses for real-time interaction
+5. **Context Management**: Maintain conversation context and user sessions
+
+### Agent Service Guidelines
+1. **No Simplified Versions**: Build full-featured agents, don't create simplified alternatives
+2. **WebSearch Integration**: Use Claude 4 native WebSearch for up-to-date information  
+3. **Multi-language Support**: Support Chinese, German, and English
+4. **Tool Coordination**: Properly orchestrate multiple AI tools and capabilities
+
+## Data Integration Standards
+
+### Crawler Integration
+1. **Apify Client**: Use latest Apify documentation for LinkedIn scraper integration
+2. **Zyte API**: Follow current Zyte API documentation for Indeed integration
+3. **Error Handling**: Implement robust error handling for external API calls
+4. **Rate Limiting**: Respect API rate limits and implement backoff strategies
+5. **Data Validation**: Validate and sanitize all scraped data
+
+### Database Operations
+1. **SQLite**: Use for user session storage with proper indexing
+2. **Chroma**: Implement vector storage with deduplication mechanisms
+3. **Data Cleaning**: Implement scheduled cleanup of expired job data
+4. **Migration Scripts**: Create proper database migration procedures
+
+## File Management
+
+### Project Structure
+- **No Temporary Files**: Do not create temporary scripts or helper files for iteration
+- **Clean Workspace**: Delete test files promptly after use
+- **Organized Structure**: Maintain clear separation between frontend and backend code
+- **Version Control**: Use proper Git practices for code management
+
+### Documentation Maintenance
+1. **Progress Updates**: Update development progress document with system time
+2. **Concise Updates**: Keep progress documentation concise but comprehensive
+3. **Regular Updates**: Update documentation at the end of each development session
+4. **Context Preservation**: Maintain development context through documentation
+
+## Testing and Deployment
+
+### Testing Requirements
+1. **Main Flow Testing**: All testing within main application flow
+2. **Integration Testing**: Test all external API integrations
+3. **User Flow Testing**: Validate complete user workflows
+4. **Performance Testing**: Ensure acceptable response times
+5. **Security Testing**: Validate authentication and data protection
+
+### Deployment Standards
+1. **Environment Variables**: Proper configuration management
+2. **Docker Support**: Container-ready deployment
+3. **Local Development**: Support easy local development setup
+4. **Production Readiness**: Ensure production deployment capabilities
+
+## Communication and Collaboration
+
+### Development Tools
+1. **Context7 MCP**: Use for accessing latest development documentation
+2. **GitHub Issues**: Track development tasks and issues
+3. **Version Control**: Maintain clean Git history
+4. **Code Reviews**: Implement proper code review processes
+
+### Problem Resolution
+1. **Error Analysis**: Thoroughly analyze and understand errors before fixing
+2. **Documentation Reference**: Always check official documentation first
+3. **Systematic Debugging**: Use systematic approach to problem-solving
+4. **Knowledge Sharing**: Document solutions for future reference
+
+## Quality Assurance
+1. **Code Standards**: Follow PEP 8 for Python, standard conventions for JavaScript
+2. **Security Practices**: Implement secure coding practices
+3. **Performance Optimization**: Optimize for speed and resource usage
+4. **User Experience**: Ensure smooth and intuitive user interactions
+5. **Accessibility**: Consider accessibility standards in frontend development

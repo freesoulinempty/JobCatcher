@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Login - JobCatcher</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+    <style>
+        .callback-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .callback-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #dc3545;
+            margin-top: 1rem;
+        }
+        
+        .success-message {
+            color: #28a745;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div class="callback-content">
+            <div class="spinner"></div>
+            <h2>Processing your login...</h2>
+            <p>Please wait while we complete the authentication process.</p>
+            <div id="status-message"></div>
+        </div>
+    </div>
+
+    <script>
+        // Google OAuth回调处理 Google OAuth callback handler
+        class OAuthCallbackHandler {
+            constructor() {
+                this.API_BASE = window.location.hostname === 'localhost' 
+                    ? 'http://localhost:8000' 
+                    : 'https://obmscqebvxqz.eu-central-1.clawcloudrun.com';
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const code = urlParams.get('code');
+                    const state = urlParams.get('state');
+                    const error = urlParams.get('error');
+
+                    if (error) {
+                        this.showError(`Authentication failed: ${error}`);
+                        return;
+                    }
+
+                    if (!code || !state) {
+                        this.showError('Invalid callback parameters');
+                        return;
+                    }
+
+                    // 处理OAuth回调 Process OAuth callback
+                    await this.processCallback(code, state);
+                    
+                } catch (error) {
+                    console.error('Callback processing failed:', error);
+                    this.showError('An unexpected error occurred during login');
+                }
+            }
+
+            async processCallback(code, state) {
+                try {
+                    const response = await fetch(`${this.API_BASE}/api/auth/callback`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            code: code,
+                            state: state
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        this.showSuccess('Login successful! Redirecting...');
+                        
+                        // 延迟后重定向到主页 Redirect to main page after delay
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 1000);
+                    } else {
+                        const error = await response.json();
+                        this.showError(error.detail || 'Authentication failed');
+                    }
+                } catch (error) {
+                    console.error('Callback request failed:', error);
+                    this.showError('Failed to complete authentication');
+                }
+            }
+
+            showError(message) {
+                const statusDiv = document.getElementById('status-message');
+                statusDiv.innerHTML = `<div class="error-message">${message}</div>`;
+                
+                // 隐藏加载动画 Hide loading spinner
+                document.querySelector('.spinner').style.display = 'none';
+                
+                // 3秒后重定向到登录页 Redirect to login after 3 seconds
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            }
+
+            showSuccess(message) {
+                const statusDiv = document.getElementById('status-message');
+                statusDiv.innerHTML = `<div class="success-message">${message}</div>`;
+                
+                // 隐藏加载动画 Hide loading spinner  
+                document.querySelector('.spinner').style.display = 'none';
+            }
+        }
+
+        // 初始化回调处理器 Initialize callback handler
+        document.addEventListener('DOMContentLoaded', () => {
+            new OAuthCallbackHandler();
+        });
+    </script>
+</body>
+</html> 

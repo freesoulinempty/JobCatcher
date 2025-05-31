@@ -1,0 +1,106 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# AI Agent System Rules
+
+## Claude 4 Sonnet Integration
+
+### Core AI Capabilities
+- **Hybrid Reasoning Mode**: Instant response + deep thinking
+- **Advanced Programming**: Enhanced coding abilities
+- **Tool Usage**: Improved tool use and parallel processing
+- **Instruction Following**: Better instruction compliance and memory
+- **Native WebSearch**: Built-in web search capabilities
+- **Native Document Processing**: PDF/DOC/TXT analysis without external libraries
+
+### Unified Agent Functions
+
+#### 1. Resume Analysis
+- Utilize Claude 4's native document understanding for deep resume analysis
+- Provide resume optimization suggestions, tech stack recommendations, learning advice
+- Extract key information: location, skills, education, experience, languages
+- Generate comprehensive analysis results via chat interface
+
+#### 2. Job Matching & Recommendations
+- Based on resume analysis results, recommend top 25 matching jobs
+- Rank recommended jobs by matching score in left display area
+- **Matching Factors** (by importance):
+  - **Skills** (Important)
+  - **Experience** (Important)  
+  - **Location** (Medium importance)
+  - **Languages** (Medium importance)
+  - **Education** (Less important)
+
+#### 3. Skills Analysis & Heatmap Generation
+- Generate job skills heatmap using Claude 4 native WebSearch
+- Search for trending job skills and perform deep thinking analysis
+- Call Artifacts tool to generate visual skills heatmap
+- Provide personalized learning recommendations
+
+#### 4. Market Consultation
+- Provide German job market consultation and career guidance
+- Use Claude 4 native WebSearch for employment market information
+- Support trilingual communication: Chinese, German, English
+- Answer questions about job tech stacks and requirements
+
+#### 5. Personalized Services
+- **Intelligent Resume Analysis**: Claude 4 native PDF/DOC/TXT processing
+- **Precise Job Matching**: Semantic understanding-based matching scores
+- **Skills Gap Analysis**: AI-driven skill assessment and heatmap generation  
+- **Learning Path Recommendations**: Personalized career development advice using WebSearch
+- **Job Tech Stack Analysis**: Generate skill requirement heatmaps for specific positions
+
+## AI Workflow Integration
+
+### Resume Processing Workflow
+1. User uploads resume → Frontend accepts → Backend receives
+2. Send to Claude 4 Agent for native document processing
+3. Extract and structure key information 
+4. Vectorize and store in Chroma (with deduplication)
+5. Return detailed analysis via chat interface
+
+### Job Recommendation Workflow
+1. Use resume vector info to query Chroma for 25 similar jobs
+2. Combine Claude 4 resume analysis + Chroma job data into prompt
+3. Send to Claude 4 for job analysis and ranking with deep thinking
+4. Return ranked job recommendations to frontend
+5. Display in left panel ordered by matching score
+
+### Skills Heatmap Workflow
+1. Receive job title or resume analysis request
+2. Use Claude 4 native WebSearch to research trending skills
+3. Perform deep thinking analysis on skill demands
+4. Generate visual heatmap using Artifacts tool
+5. Provide personalized learning recommendations
+
+## Development Guidelines
+
+### Claude 4 Integration Best Practices
+1. **Use Native Capabilities**: Leverage built-in document processing and WebSearch
+2. **Deep Thinking Mode**: Utilize thinking capabilities for complex analysis
+3. **Streaming Responses**: Implement streaming for real-time user interaction
+4. **Tool Orchestration**: Coordinate multiple tools (WebSearch, Artifacts, Vector Search)
+5. **Context Management**: Maintain conversation context and user preferences
+
+### API Integration Standards
+1. Handle Claude 4 API rate limits and error responses
+2. Implement proper retry mechanisms for API calls
+3. Monitor token usage and costs
+4. Cache frequently accessed results when appropriate
+5. Ensure secure API key management
+
+### Agent Response Patterns
+1. **Structured Analysis**: Provide clear, organized information
+2. **Actionable Insights**: Give specific, practical recommendations
+3. **Evidence-Based**: Use WebSearch to support recommendations
+4. **Multilingual Support**: Handle Chinese, German, and English seamlessly
+5. **Progressive Disclosure**: Present information in digestible chunks
+
+## Quality Assurance
+1. Test all AI capabilities with various resume types and job searches
+2. Validate heatmap generation accuracy and visual quality
+3. Ensure trilingual support works correctly
+4. Monitor response times and optimize for performance
+5. Regularly update prompts based on user feedback and results

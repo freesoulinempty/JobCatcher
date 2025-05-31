@@ -1,0 +1,57 @@
+# Python缓存文件 / Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 环境变量文件 / Environment files
+.env
+.env.local
+.env.production
+
+# 数据库文件 / Database files
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# 日志文件 / Log files
+logs/
+*.log
+
+# 上传文件 / Upload files
+uploads/
+
+# IDE文件 / IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 操作系统文件 / OS files
+.DS_Store
+Thumbs.db
+
+# 临时文件 / Temporary files
+*.tmp
+*.bak
+*.backup
+
+# Node.js (如果有前端构建) / Node.js (if frontend build)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 分发文件 / Distribution files
+dist/
+build/
+
+# 测试覆盖率 / Test coverage
+.coverage
+htmlcov/
+
+# 虚拟环境 / Virtual environment
+venv/
+env/
+ENV/ 
