@@ -84,7 +84,7 @@ python -c "from app.main import app; print('✅ 应用模块导入成功')"
 # ⚠️ 关键：必须在backend目录下执行此命令
 # 当前目录必须是 /home/devbox/project/JobCatcher/backend
 pwd  # 再次确认目录
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+cd JobCathcer/backend & python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ---

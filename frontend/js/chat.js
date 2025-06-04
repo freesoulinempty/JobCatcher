@@ -705,7 +705,7 @@ class ChatManager {
             
             // Remove upload indicator
             chatMessages.removeChild(uploadIndicator);
-            
+
             // Show upload success message
             const successMessage = document.createElement('div');
             successMessage.className = 'message bot-message';

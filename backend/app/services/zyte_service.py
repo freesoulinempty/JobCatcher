@@ -120,24 +120,24 @@ class ZyteIndeedService:
                 "url": url,
                 "jobPostingNavigation": True,
                 "jobPostingNavigationOptions": {
-                    "extractFrom": "httpResponseBody"
+                    "extractFrom": "browserHtml"  # 使用浏览器渲染而不是HTTP响应体 / Use browser rendering instead of HTTP response body
                 },
-                # 添加浏览器模拟和反检测配置 / Add browser simulation and anti-detection config
+                # 浏览器模拟配置 / Browser simulation config
                 "browserHtml": True,
                 "actions": [
-                    {"action": "waitForSelector", "selector": ".jobsearch-SerpJobCard", "timeout": 10000},
-                    {"action": "wait", "time": 2000}  # 等待页面完全加载 / Wait for full page load
+                    {
+                        "action": "waitForSelector", 
+                        "selector": {
+                            "type": "css",
+                            "value": ".jobsearch-SerpJobCard"
+                        }, 
+                        "timeout": 10
+                    },
+                    {"action": "waitForTimeout", "timeout": 2}  # 等待页面完全加载 / Wait for full page load
                 ],
-                "httpResponseHeaders": True,
                 "screenshot": False,  # 不需要截图以节省成本 / No screenshot to save cost
                 "sessionContextParameters": {
-                    "geolocation": {"country": "DE"}  # 设置德国地理位置 / Set German geolocation
-                },
-                # 添加自定义请求头 / Add custom headers
-                "requestHeaders": {
-                    "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
-                    "Cache-Control": "no-cache",
-                    "Pragma": "no-cache"
+                    # 地理位置现在通过IP类型自动处理 / Geolocation is now handled automatically via IP type
                 }
             })
             
@@ -176,10 +176,10 @@ class ZyteIndeedService:
                 "url": url,
                 "browserHtml": True,
                 "actions": [
-                    {"action": "wait", "time": 3000}  # 简单等待 / Simple wait
+                    {"action": "waitForTimeout", "timeout": 3}  # 简单等待 / Simple wait
                 ],
                 "sessionContextParameters": {
-                    "geolocation": {"country": "DE"}
+                    # 地理位置自动处理 / Geolocation handled automatically
                 }
             })
             
@@ -218,19 +218,23 @@ class ZyteIndeedService:
                 "url": job_url,
                 "jobPosting": True,
                 "jobPostingOptions": {
-                    "extractFrom": "httpResponseBody"
+                    "extractFrom": "browserHtml"  # 使用浏览器渲染而不是HTTP响应体 / Use browser rendering instead of HTTP response body
                 },
-                # 添加浏览器模拟 / Add browser simulation
+                # 浏览器模拟配置 / Browser simulation config
                 "browserHtml": True,
                 "actions": [
-                    {"action": "waitForSelector", "selector": ".jobsearch-JobComponent", "timeout": 10000},
-                    {"action": "wait", "time": 1500}  # 等待内容加载 / Wait for content load
+                    {
+                        "action": "waitForSelector", 
+                        "selector": {
+                            "type": "css",
+                            "value": ".jobsearch-JobComponent"
+                        }, 
+                        "timeout": 10
+                    },
+                    {"action": "waitForTimeout", "timeout": 1.5}  # 等待内容加载 / Wait for content load
                 ],
                 "sessionContextParameters": {
-                    "geolocation": {"country": "DE"}
-                },
-                "requestHeaders": {
-                    "Accept-Language": "de-DE,de;q=0.9,en;q=0.8"
+                    # 地理位置自动处理 / Geolocation handled automatically
                 }
             })
             

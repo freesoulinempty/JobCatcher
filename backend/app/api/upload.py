@@ -141,7 +141,7 @@ async def _prepare_document_for_claude(file_path: str, content_type: str, file_c
                 "content": text_content,
                 "claude_format": "text"
             }
-            
+                
         elif content_type in ['application/msword', 
                              'application/vnd.openxmlformats-officedocument.wordprocessingml.document']:
             # Word文档：提取文本内容（Claude 4暂不支持原生Word处理） / Word: extract text (Claude 4 doesn't support native Word yet)
@@ -430,7 +430,7 @@ async def get_resume_info(filename: str, user_id: str):
         raise
     except Exception as e:
         logger.error(f"Get resume info failed: {e}")
-        raise HTTPException(status_code=500, detail=f"获取文件信息失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"获取文件信息失败: {str(e)}") 
 
 
 @router.get("/health")

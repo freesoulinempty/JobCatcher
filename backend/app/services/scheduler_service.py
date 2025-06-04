@@ -35,15 +35,15 @@ class SchedulerService:
         try:
             # 添加定时任务 / Add scheduled tasks
             try:
-                # 定时爬取任务：德国时间凌晨1.00点 / Scheduled crawling task: 1.00 AM German time
+                # 定时爬取任务：德国时间晚上8.00点 / Scheduled crawling task: 20.00 PM German time
                 self.scheduler.add_job(
                     self._scheduled_crawl_job,
-                    CronTrigger(hour=1, minute=0, timezone=self.german_tz),  # 德国时间凌晨1.00点 / 1.00 AM German time
+                    CronTrigger(hour=20, minute=0, timezone=self.german_tz),  # 德国时间晚上8.00点 / 20.00 PM German time
                     id="daily_crawl",
                     name="Daily Job Crawling",
                     replace_existing=True
                 )
-                logger.info("✅ 定时爬取任务已设置：德国时间每天凌晨1.00点 / Scheduled crawling task set: 1.00 AM German time daily")
+                logger.info("✅ 定时爬取任务已设置：德国时间每天晚上8.00点 / Scheduled crawling task set: 20.00 PM German time daily")
                 
                 # 数据清理任务：德国时间下午9.00点 / Data cleanup task: 9.00 PM German time
                 self.scheduler.add_job(
@@ -63,7 +63,7 @@ class SchedulerService:
             current_german_time = datetime.now(self.german_tz)
             logger.info(f"Scheduler service started successfully")
             logger.info(f"Current German time: {current_german_time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
-            logger.info(f"Next crawl scheduled for: German time 01:00 daily")
+            logger.info(f"Next crawl scheduled for: German time 20:00 daily")
             logger.info(f"Next cleanup scheduled for: German time 21:00 daily")
             
         except Exception as e:
@@ -81,7 +81,7 @@ class SchedulerService:
     async def _scheduled_crawl_job(self):
         """
         定时爬取任务 / Scheduled crawling job
-        按照README要求：每日01.00点定时爬取预设岗位数据 / According to README: daily crawling at 01.00 for preset job titles
+        按照README要求：每日20.00点定时爬取预设岗位数据 / According to README: daily crawling at 20.00 for preset job titles
         LinkedIn预设岗位: "engineer","manager","IT","Finance","Sales","Nurse","Consultant","software developer"
         Indeed预设岗位: "Web","cloud","AI","Data","software"
         """
@@ -324,50 +324,4 @@ class SchedulerService:
         except Exception as e:
             logger.error(f"Error checking job cleanup status: {e}")
             return False, 'check_error'
-    
-    async def trigger_manual_crawl(self) -> Dict[str, Any]:
-        """
-        手动触发爬取任务 / Manually trigger crawling task
-        
-        Returns:
-            任务执行结果 / Task execution result
-        """
-        try:
-            logger.info("Manual crawl triggered by admin")
-            await self._scheduled_crawl_job()
-            return {
-                "status": "success",
-                "message": "Manual crawl completed successfully",
-                "timestamp": datetime.now().isoformat()
-            }
-        except Exception as e:
-            logger.error(f"Manual crawl failed: {e}")
-            return {
-                "status": "error",
-                "message": f"Manual crawl failed: {str(e)}",
-                "timestamp": datetime.now().isoformat()
-            }
-    
-    async def trigger_manual_cleanup(self) -> Dict[str, Any]:
-        """
-        手动触发清理任务 / Manually trigger cleanup task
-        
-        Returns:
-            任务执行结果 / Task execution result
-        """
-        try:
-            logger.info("Manual cleanup triggered by admin")
-            await self._scheduled_cleanup_job()
-            return {
-                "status": "success",
-                "message": "Manual cleanup completed successfully",
-                "timestamp": datetime.now().isoformat()
-            }
-        except Exception as e:
-            logger.error(f"Manual cleanup failed: {e}")
-            return {
-                "status": "error",
-                "message": f"Manual cleanup failed: {str(e)}",
-                "timestamp": datetime.now().isoformat()
-            }
     
