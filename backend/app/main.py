@@ -43,6 +43,12 @@ async def lifespan(app: FastAPI):
         db_connections = await init_databases()
         app.state.db_connections = db_connections
         
+        # 🔥 初始化Claude服务 / Initialize Claude service
+        from app.services.claude_service import ClaudeService
+        claude_service = ClaudeService()
+        app.state.claude_service = claude_service
+        logger.info("Claude service initialized successfully")
+        
         # 启动定时任务服务 / Start scheduler service
         scheduler_service = SchedulerService()
         await scheduler_service.start()

@@ -56,7 +56,7 @@ class AuthManager {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('✅ Got OAuth URL, redirecting to Google...');
+                console.log('Redirecting to Google OAuth...');
                 
                 // Redirect to Google OAuth
                 window.location.href = data.authorization_url;

@@ -22,11 +22,10 @@ class JobsManager {
             return;
         }
         
-        console.log('🔧 Initializing JobsManager...');
         this.initializeElements();
         this.bindEvents();
         this.isInitialized = true;
-        console.log('✅ JobsManager initialized successfully');
+        console.log('JobsManager initialized successfully');
     }
     
     initializeElements() {
@@ -35,23 +34,17 @@ class JobsManager {
         this.locationInput = document.getElementById('location');
         this.jobsContainer = document.getElementById('jobsContainer');
         this.resultsCount = document.getElementById('resultsCount');
-        this.loadingIndicator = document.getElementById('loadingIndicator');
-        this.noJobsMessage = document.getElementById('noJobsMessage');
     }
     
     bindEvents() {
-        console.log('🔧 Binding JobsManager events...');
-        
         // 绑定搜索按钮点击事件 / Bind search button click event
         if (this.searchBtn) {
-            console.log('✅ Search button found, binding click event');
             
             // 移除之前的事件监听器（如果存在）/ Remove previous event listeners if any
             this.searchBtn.removeEventListener('click', this.handleJobSearchBound);
             
             // 绑定方法到this上下文 / Bind method to this context
             this.handleJobSearchBound = (e) => {
-                console.log('🔍 Search button clicked');
                 e.preventDefault();
                 this.handleJobSearch();
             };
@@ -63,14 +56,12 @@ class JobsManager {
         
         // 绑定回车键搜索 / Bind Enter key search
         if (this.jobTitleInput) {
-            console.log('✅ Job title input found, binding keypress event');
             
             // 移除之前的事件监听器 / Remove previous event listeners
             this.jobTitleInput.removeEventListener('keypress', this.handleJobTitleKeyPressBound);
             
             this.handleJobTitleKeyPressBound = (e) => {
                 if (e.key === 'Enter') {
-                    console.log('🔍 Enter key pressed in job title input');
                     e.preventDefault();
                     this.handleJobSearch();
                 }
@@ -82,14 +73,12 @@ class JobsManager {
         }
         
         if (this.locationInput) {
-            console.log('✅ Location input found, binding keypress event');
             
             // 移除之前的事件监听器 / Remove previous event listeners
             this.locationInput.removeEventListener('keypress', this.handleLocationKeyPressBound);
             
             this.handleLocationKeyPressBound = (e) => {
                 if (e.key === 'Enter') {
-                    console.log('🔍 Enter key pressed in location input');
                     e.preventDefault();
                     this.handleJobSearch();
                 }
@@ -100,24 +89,16 @@ class JobsManager {
             console.error('❌ Location input not found!');
         }
         
-        console.log('🔧 JobsManager events binding completed');
+
     }
     
     async handleJobSearch() {
-        console.log('🚀 Starting job search...');
-
-        if (this.isLoading) {
-            console.log('⏳ Search already in progress, skipping...');
-            return;
-        }
+        if (this.isLoading) return;
 
         const jobTitle = this.jobTitleInput?.value?.trim();
         const location = this.locationInput?.value?.trim();
         
-        console.log('📝 Search parameters:', { jobTitle, location });
-        
         if (!jobTitle) {
-            console.log('❌ No job title provided');
             alert('Please enter a job title');
             return;
         }
@@ -133,9 +114,9 @@ class JobsManager {
                 },
                 credentials: 'include',
                 body: JSON.stringify({
-                    job_title: jobTitle,  // 修正字段名：query -> job_title
-                    location: location || null,
-                    max_results: 25  // 修正字段名：limit -> max_results
+                    keywords: jobTitle,  // 🔥 修正字段名：使用keywords / Fixed field name: use keywords
+                    city: location || null,  // 🔥 修正字段名：使用city / Fixed field name: use city
+                    max_results: 25
                 })
             });
 
@@ -160,21 +141,13 @@ class JobsManager {
     }
     
     showLoading() {
-        if (this.loadingIndicator) {
-            this.loadingIndicator.style.display = 'block';
-        }
         if (this.jobsContainer) {
-            this.jobsContainer.style.display = 'none';
-        }
-        if (this.noJobsMessage) {
-            this.noJobsMessage.style.display = 'none';
+            this.jobsContainer.innerHTML = '<div class="loading-message">Searching jobs...</div>';
         }
     }
     
     hideLoading() {
-        if (this.loadingIndicator) {
-            this.loadingIndicator.style.display = 'none';
-        }
+        // Loading will be replaced by actual results or error message
     }
     
     displayJobs(jobs) {
@@ -197,34 +170,34 @@ class JobsManager {
             return;
         }
 
-        // 按相关性排序 Sort by relevance
-        jobs.sort((a, b) => {
-            // 可以根据需要添加排序逻辑 Add sorting logic as needed
-            return 0;
-        });
+
 
         const jobsHTML = jobs.map(job => this.createJobCard(job)).join('');
 
         this.jobsContainer.innerHTML = jobsHTML;
-        this.jobsContainer.style.display = 'block';
-        
-        if (this.noJobsMessage) {
-            this.noJobsMessage.style.display = 'none';
-    }
 
         // 绑定事件 Bind events
         this.bindJobCardEvents();
     }
     
     createJobCard(job) {
-        const description = job.description || 'No description available';
-        const truncatedDescription = description.length > 150 
-            ? description.substring(0, 150) + '...' 
-            : description;
+        // 🔥 优先使用full_description，回退到description / Prioritize full_description, fallback to description
+        const fullDescription = job.full_description || job.description || 'No description available';
+        const shortDescription = job.description || fullDescription || 'No description available';
         
-        // 根据README要求，只显示办公形式(work_type)标签 / According to README, only show work_type tag
+        // 🔥 创建简短描述用于预览 / Create short description for preview
+        const truncatedDescription = shortDescription.length > 200 
+            ? shortDescription.substring(0, 200) + '...' 
+            : shortDescription;
+        
+        // 🔥 移除匹配度显示 / Remove match score display
+        const relevanceScore = '';
+        
+        // 根据README要求，显示办公形式和薪资信息 / According to README, show work_type and salary info  
         const workTypeTag = job.work_type ? 
-            `<span class="tag work-type">${job.work_type}</span>` : '';
+            `<span class="simple-tag">${job.work_type}</span>` : '';
+        const salaryTag = job.salary ? 
+            `<span class="simple-tag">${job.salary}</span>` : '';
 
         return `
             <div class="job-card" data-job-id="${job.id}">
@@ -239,12 +212,14 @@ class JobsManager {
                             <i class="fas fa-map-marker-alt"></i>
                             ${job.location}
                         </span>
+                        ${relevanceScore}
                     </div>
                 </div>
                 
-                ${workTypeTag ? `
+                ${workTypeTag || salaryTag ? `
                 <div class="job-tags">
                     ${workTypeTag}
+                    ${salaryTag}
                 </div>
                 ` : ''}
                 
@@ -266,7 +241,13 @@ class JobsManager {
                 <div class="job-full-description" style="display: none;">
                     <div class="full-description-content">
                         <h4><i class="fas fa-file-alt"></i> Complete Job Description</h4>
-                        <div class="description-text">${description}</div>
+                        <div class="description-text">${fullDescription}</div>
+                        ${job.posted_date ? 
+                            `<div class="job-info">
+                                <strong><i class="fas fa-calendar"></i> Posted:</strong> ${job.posted_date}
+                            </div>` 
+                            : ''
+                        }
                         ${job.apply_url && job.apply_url !== job.url ? 
                             `<div class="apply-info">
                                 <strong><i class="fas fa-link"></i> Direct Application Link:</strong> 
@@ -309,21 +290,13 @@ class JobsManager {
     
     showNoJobs() {
         if (this.jobsContainer) {
-            this.jobsContainer.style.display = 'none';
+            this.jobsContainer.innerHTML = '<div class="no-jobs-message">No jobs found. Try different keywords or location.</div>';
         }
-        if (this.noJobsMessage) {
-            this.noJobsMessage.style.display = 'block';
-    }
     }
     
     showError(message) {
         if (this.jobsContainer) {
-            this.jobsContainer.innerHTML = `
-                <div class="error-message">
-                    <p>${message}</p>
-            </div>
-        `;
-            this.jobsContainer.style.display = 'block';
+            this.jobsContainer.innerHTML = `<div class="error-message">${message}</div>`;
         }
     }
 }

@@ -115,11 +115,30 @@ class ZyteIndeedService:
             职位详情链接列表 / List of job detail URLs
         """
         try:
-            # 按照README示例调用方式 / Call according to README example
+            # 改进的请求配置以避开反爬虫检测 / Improved request config to avoid anti-bot detection
             api_response = await self.client.get({
                 "url": url,
                 "jobPostingNavigation": True,
-                "jobPostingNavigationOptions": {"extractFrom": "httpResponseBody"},
+                "jobPostingNavigationOptions": {
+                    "extractFrom": "httpResponseBody"
+                },
+                # 添加浏览器模拟和反检测配置 / Add browser simulation and anti-detection config
+                "browserHtml": True,
+                "actions": [
+                    {"action": "waitForSelector", "selector": ".jobsearch-SerpJobCard", "timeout": 10000},
+                    {"action": "wait", "time": 2000}  # 等待页面完全加载 / Wait for full page load
+                ],
+                "httpResponseHeaders": True,
+                "screenshot": False,  # 不需要截图以节省成本 / No screenshot to save cost
+                "sessionContextParameters": {
+                    "geolocation": {"country": "DE"}  # 设置德国地理位置 / Set German geolocation
+                },
+                # 添加自定义请求头 / Add custom headers
+                "requestHeaders": {
+                    "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache"
+                }
             })
             
             job_navigation = api_response.get("jobPostingNavigation", {})
@@ -129,13 +148,58 @@ class ZyteIndeedService:
             if "items" in job_navigation:
                 for job in job_navigation["items"]:
                     if "url" in job:
-                        job_links.append(job["url"])
+                        # 确保URL是完整的Indeed链接 / Ensure URL is complete Indeed link
+                        job_url = job["url"]
+                        if job_url.startswith("/"):
+                            job_url = "https://de.indeed.com" + job_url
+                        job_links.append(job_url)
             
             logger.info(f"Found {len(job_links)} job links from navigation")
             return job_links
             
         except Exception as e:
-            logger.error(f"Failed to scrape job navigation: {e}")
+            if "520" in str(e) or "521" in str(e):
+                logger.warning(f"Indeed anti-bot protection detected (status 520/521). This is normal for job sites. Trying alternative approach...")
+                # 尝试备用方法：直接解析HTML / Try alternative: direct HTML parsing
+                return await self._fallback_scrape_job_links(url)
+            else:
+                logger.error(f"Failed to scrape job navigation: {e}")
+                return []
+    
+    async def _fallback_scrape_job_links(self, url: str) -> List[str]:
+        """
+        备用的职位链接爬取方法 / Fallback job link scraping method
+        """
+        try:
+            # 使用基础浏览器HTML爬取 / Use basic browser HTML scraping
+            api_response = await self.client.get({
+                "url": url,
+                "browserHtml": True,
+                "actions": [
+                    {"action": "wait", "time": 3000}  # 简单等待 / Simple wait
+                ],
+                "sessionContextParameters": {
+                    "geolocation": {"country": "DE"}
+                }
+            })
+            
+            html_content = api_response.get("browserHtml", "")
+            job_links = []
+            
+            # 简单的HTML解析查找job链接 / Simple HTML parsing for job links
+            import re
+            job_pattern = r'href="(/viewjob\?jk=[^"]+)"'
+            matches = re.findall(job_pattern, html_content)
+            
+            for match in matches:
+                job_url = "https://de.indeed.com" + match
+                job_links.append(job_url)
+            
+            logger.info(f"Fallback method found {len(job_links)} job links")
+            return job_links[:25]  # 限制数量 / Limit quantity
+            
+        except Exception as e:
+            logger.error(f"Fallback scraping also failed: {e}")
             return []
     
     async def _scrape_job_details(self, job_url: str) -> Optional[JobPosting]:
@@ -149,14 +213,34 @@ class ZyteIndeedService:
             职位对象或None / JobPosting object or None
         """
         try:
-            # 按照README示例调用方式 / Call according to README example
+            # 改进的岗位详情爬取配置 / Improved job detail scraping config
             api_response = await self.client.get({
                 "url": job_url,
                 "jobPosting": True,
-                "jobPostingOptions": {"extractFrom": "httpResponseBody"},
+                "jobPostingOptions": {
+                    "extractFrom": "httpResponseBody"
+                },
+                # 添加浏览器模拟 / Add browser simulation
+                "browserHtml": True,
+                "actions": [
+                    {"action": "waitForSelector", "selector": ".jobsearch-JobComponent", "timeout": 10000},
+                    {"action": "wait", "time": 1500}  # 等待内容加载 / Wait for content load
+                ],
+                "sessionContextParameters": {
+                    "geolocation": {"country": "DE"}
+                },
+                "requestHeaders": {
+                    "Accept-Language": "de-DE,de;q=0.9,en;q=0.8"
+                }
             })
             
             job_posting_data = api_response.get("jobPosting")
+            if not job_posting_data:
+                # 如果结构化数据提取失败，尝试HTML解析 / If structured extraction fails, try HTML parsing
+                html_content = api_response.get("browserHtml", "")
+                if html_content:
+                    job_posting_data = self._parse_job_from_html(html_content, job_url)
+                
             if not job_posting_data:
                 return None
                 
@@ -165,8 +249,68 @@ class ZyteIndeedService:
             return job_posting
             
         except Exception as e:
-            logger.error(f"Failed to scrape job details from {job_url}: {e}")
+            if "520" in str(e) or "521" in str(e):
+                logger.warning(f"Job detail protected by anti-bot (520/521): {job_url}")
+                # 对于520/521错误，返回基础职位信息 / For 520/521 errors, return basic job info
+                return self._create_basic_job_posting(job_url)
+            else:
+                logger.error(f"Failed to scrape job details from {job_url}: {e}")
+                return None
+    
+    def _parse_job_from_html(self, html_content: str, job_url: str) -> Optional[Dict[str, Any]]:
+        """
+        从HTML内容解析职位信息 / Parse job information from HTML content
+        """
+        try:
+            import re
+            from bs4 import BeautifulSoup
+            
+            soup = BeautifulSoup(html_content, 'html.parser')
+            
+            # 提取基础信息 / Extract basic information
+            title_elem = soup.find(['h1', 'h2'], class_=re.compile(r'jobsearch-JobInfoHeader-title'))
+            company_elem = soup.find(['span', 'div'], class_=re.compile(r'companyName'))
+            location_elem = soup.find(['div', 'span'], class_=re.compile(r'companyLocation'))
+            description_elem = soup.find(['div'], class_=re.compile(r'jobsearch-jobDescriptionText'))
+            
+            return {
+                "name": title_elem.get_text(strip=True) if title_elem else "Position Available",
+                "hiringOrganization": {
+                    "name": company_elem.get_text(strip=True) if company_elem else "Company"
+                },
+                "jobLocation": {
+                    "address": {
+                        "addressLocality": location_elem.get_text(strip=True) if location_elem else "Germany"
+                    }
+                },
+                "description": description_elem.get_text(strip=True)[:1000] if description_elem else "Job description available on site",
+                "url": job_url
+            }
+            
+        except Exception as e:
+            logger.error(f"HTML parsing failed: {e}")
             return None
+    
+    def _create_basic_job_posting(self, job_url: str) -> JobPosting:
+        """
+        创建基础职位信息 / Create basic job posting
+        """
+        # 从URL中提取job ID / Extract job ID from URL
+        import re
+        job_id_match = re.search(r'jk=([^&]+)', job_url)
+        job_id = job_id_match.group(1) if job_id_match else "unknown"
+        
+        return JobPosting(
+            id=f"indeed_{job_id}",
+            title="Position Available (Protected by Anti-Bot)",
+            company_name="Company (Protected)",
+            location="Germany",
+            employment_type="Unknown",
+            description="Job details protected by anti-bot system. Please visit link for details.",
+            url=job_url,
+            source=JobSource.INDEED,
+            scraped_at=datetime.utcnow()
+        )
     
     def _parse_indeed_job(self, job_data: Dict[str, Any], job_url: str) -> Optional[JobPosting]:
         """

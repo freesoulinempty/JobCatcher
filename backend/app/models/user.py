@@ -72,6 +72,7 @@ class ChatRequest(BaseModel):
     """聊天请求 / Chat request"""
     message: str
     context: Optional[Dict[str, Any]] = None
+    session_id: Optional[str] = None
 
 
 class ChatResponse(BaseModel):

@@ -24,7 +24,7 @@ class JobCatcherApp {
     async init() {
         if (this.isInitialized) return;
         
-        console.log('🚀 Initializing JobCatcher App...');
+        console.log('Initializing JobCatcher App...');
         
         try {
             // 显示加载屏幕 / Show loading screen
@@ -44,7 +44,7 @@ class JobCatcherApp {
             }
             
             this.isInitialized = true;
-            console.log('✅ JobCatcher App initialized successfully');
+            console.log('JobCatcher App initialized successfully');
             
         } catch (error) {
             console.error('❌ Failed to initialize app:', error);
@@ -145,6 +145,11 @@ class JobCatcherApp {
         // 初始化JobsManager（只在主应用显示时）/ Initialize JobsManager only when main app is shown
         if (window.jobsManager && !window.jobsManager.isInitialized) {
             window.jobsManager.initialize();
+        }
+        
+        // 初始化ChatManager（只在主应用显示时）/ Initialize ChatManager only when main app is shown
+        if (window.chatManager && !window.chatManager.isInitialized) {
+            window.chatManager.init();
         }
         
         // 更新用户界面 / Update user interface

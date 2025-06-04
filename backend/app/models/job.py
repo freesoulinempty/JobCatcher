@@ -68,8 +68,8 @@ class JobPosting(BaseModel):
 
 class JobSearchRequest(BaseModel):
     """职位搜索请求 / Job search request"""
-    job_title: str
-    location: Optional[str] = None
+    keywords: str  # 🔥 修正字段名：job_title -> keywords / Fixed field name: job_title -> keywords
+    city: Optional[str] = None  # 🔥 修正字段名：location -> city / Fixed field name: location -> city
     max_results: int = 25
 
 
