@@ -24,7 +24,7 @@ class ApifyLinkedInService:
         self, 
         job_title: str, 
         location: Optional[str] = None, 
-        limit: int = 25
+        limit: int = 50
     ) -> List[JobPosting]:
         """
         搜索LinkedIn职位 / Search LinkedIn jobs
@@ -82,13 +82,13 @@ class ApifyLinkedInService:
         Returns:
             所有爬取的职位列表 / List of all scraped jobs
         """
-        # 根据README更新：8个预设岗位 / According to README update: 8 preset job titles
-        preset_jobs = ["engineer", "manager", "IT", "Finance", "Sales", "Nurse", "Consultant", "software developer"]
+        # 根据README更新：10个预设岗位 / According to README update: 10 preset job titles
+        preset_jobs = ["engineer", "manager", "IT", "Finance", "Sales", "Nurse", "Consultant", "software developer","python","java"]
         all_jobs = []
         
         for job_title in preset_jobs:
             try:
-                jobs = await self.search_jobs(job_title, location=None, limit=25)
+                jobs = await self.search_jobs(job_title, location=None, limit=50)
                 all_jobs.extend(jobs)
                 
                 # 添加延迟避免频率限制 / Add delay to avoid rate limiting

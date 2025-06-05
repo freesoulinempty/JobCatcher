@@ -35,25 +35,25 @@ class SchedulerService:
         try:
             # 添加定时任务 / Add scheduled tasks
             try:
-                # 定时爬取任务：德国时间晚上8.00点 / Scheduled crawling task: 20.00 PM German time
+                # 定时爬取任务：德国时间下午1.00点 / Scheduled crawling task: 13.00 PM German time
                 self.scheduler.add_job(
                     self._scheduled_crawl_job,
-                    CronTrigger(hour=20, minute=0, timezone=self.german_tz),  # 德国时间晚上8.00点 / 20.00 PM German time
+                    CronTrigger(hour=13, minute=0, timezone=self.german_tz),  # 德国时间下午1.00点 / 13.00 PM German time    
                     id="daily_crawl",
                     name="Daily Job Crawling",
                     replace_existing=True
                 )
-                logger.info("✅ 定时爬取任务已设置：德国时间每天晚上8.00点 / Scheduled crawling task set: 20.00 PM German time daily")
+                logger.info("✅ 定时爬取任务已设置：德国时间每天晚上1.00点 / Scheduled crawling task set: 13.00 PM German time daily")
                 
-                # 数据清理任务：德国时间下午9.00点 / Data cleanup task: 9.00 PM German time
+                # 数据清理任务：德国时间下午12.00点 / Data cleanup task: 12.00 PM German time
                 self.scheduler.add_job(
                     self._scheduled_cleanup_job,
-                    CronTrigger(hour=21, minute=0, timezone=self.german_tz),  # 德国时间下午9.00点 /  9.00 PM German time
+                    CronTrigger(hour=12, minute=0, timezone=self.german_tz),  # 德国时间下午12.00点 /  12.00 PM German time
                     id="daily_cleanup",
                     name="Daily Data Cleanup",
                     replace_existing=True
                 )
-                logger.info("✅ 数据清理任务已设置：德国时间每天下午9.00点 / Data cleanup task set: 9.00 PM German time daily")
+                logger.info("✅ 数据清理任务已设置：德国时间每天下午12.00点 / Data cleanup task set: 12.00 PM German time daily")
             except Exception as e:
                 logger.error(f"Failed to add scheduled tasks: {e}")
             
@@ -63,8 +63,8 @@ class SchedulerService:
             current_german_time = datetime.now(self.german_tz)
             logger.info(f"Scheduler service started successfully")
             logger.info(f"Current German time: {current_german_time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
-            logger.info(f"Next crawl scheduled for: German time 20:00 daily")
-            logger.info(f"Next cleanup scheduled for: German time 21:00 daily")
+            logger.info(f"Next crawl scheduled for: German time 13:00 daily")
+            logger.info(f"Next cleanup scheduled for: German time 12:00 daily")
             
         except Exception as e:
             logger.error(f"Failed to start scheduler service: {e}")
@@ -81,7 +81,7 @@ class SchedulerService:
     async def _scheduled_crawl_job(self):
         """
         定时爬取任务 / Scheduled crawling job
-        按照README要求：每日20.00点定时爬取预设岗位数据 / According to README: daily crawling at 20.00 for preset job titles
+        按照README要求：每日13.00点定时爬取预设岗位数据 / According to README: daily crawling at 13.00 for preset job titles
         LinkedIn预设岗位: "engineer","manager","IT","Finance","Sales","Nurse","Consultant","software developer"
         Indeed预设岗位: "Web","cloud","AI","Data","software"
         """
@@ -118,7 +118,7 @@ class SchedulerService:
     async def _scheduled_cleanup_job(self):
         """
         定时数据清理任务 / Scheduled data cleanup job
-        按照README要求：每天下午9.00点访问Chroma中所有岗位URL，如果URL失效则清理
+        按照README要求：每天下午12.00点访问Chroma中所有岗位URL，如果URL失效则清理
         清理14天之前的岗位数据，防止僵尸岗位
         """
         try:
