@@ -101,7 +101,7 @@ app.include_router(upload.router, prefix="/api/upload", tags=["Upload"])
 async def root():
     """根路径健康检查 / Root path health check"""
     return {
-        "message": "JobCatcher API is running",
+        "message": "JobCatcher API is running 技能热点图未完成",
         "version": settings.app_version,
         "status": "healthy"
     }

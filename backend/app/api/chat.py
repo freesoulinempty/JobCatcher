@@ -29,6 +29,123 @@ def get_claude_service() -> ClaudeService:
         logger.info("Created global ClaudeService instance for session management")
     return _global_claude_service
 
+def _should_trigger_job_query(message: str, context: Dict[Any, Any]) -> bool:
+    """
+    判断是否应该触发职位查询 / Determine if job query should be triggered
+    🔥 关键修复：严格限制只在简历上传后或明确职位请求时触发 / CRITICAL FIX: Strictly limit to resume upload or explicit job requests
+    """
+    message_lower = message.lower()
+    
+    # 🔥 首要检查：是否是技能热点图请求，如果是则直接不触发职位查询 / PRIMARY CHECK: If skill heatmap request, never trigger job query
+    skill_heatmap_keywords = [
+        'skills heatmap', 'skill heatmap', 'heatmap', '技能热点图', '技能热力图', 
+        'skills analysis', 'skill analysis', '技能分析', 'trending skills', '热门技能',
+        'skill map', '技能地图', '能力图谱', 'skill trends', '技能趋势'
+    ]
+    
+    is_skill_heatmap_request = any(keyword in message_lower for keyword in skill_heatmap_keywords)
+    if is_skill_heatmap_request:
+        logger.info(f"🚫 Job query NOT triggered: Skill heatmap request detected - '{message[:50]}...'")
+        return False
+    
+    # 🔥 核心逻辑1：只有在上传简历的情况下，才考虑职位推荐 / CORE LOGIC 1: Only consider job recommendations when resume is uploaded
+    has_resume = context.get('resume_uploaded') or context.get('uploaded_file')
+    
+    if not has_resume:
+        # 🔥 严格限制：没有简历时，只在明确的职位搜索请求下才触发 / STRICT LIMIT: Without resume, only trigger for explicit job search
+        explicit_job_search_keywords = [
+            'find job', 'search job', 'job search', 'job listing', 'job posting',
+            '找工作', '搜索工作', '职位搜索', '招聘信息', '工作机会'
+        ]
+        
+        is_explicit_job_search = any(keyword in message_lower for keyword in explicit_job_search_keywords)
+        if is_explicit_job_search:
+            logger.info(f"🔍 Job query triggered: Explicit job search without resume - '{message[:50]}...'")
+            return True
+        else:
+            logger.info(f"🚫 Job query NOT triggered: No resume uploaded and not explicit job search - '{message[:50]}...'")
+            return False
+    
+    # 🔥 核心逻辑2：有简历的情况下，检查是否需要职位推荐 / CORE LOGIC 2: With resume, check if job recommendation needed
+    
+    # 1. 刚上传简历时自动触发 / Auto-trigger when resume just uploaded
+    if context.get('resume_uploaded'):
+        logger.info("🔍 Job query triggered: Resume just uploaded")
+        return True
+    
+    # 2. 用户明确要求职位推荐 / User explicitly requests job recommendations
+    job_request_keywords = [
+        'recommend job', 'job recommendation', 'match job', 'job match', 
+        'suitable job', 'job for me', 'job opportunity',
+        '推荐工作', '推荐职位', '匹配工作', '适合的工作', '工作机会',
+        'find matching job', '找到匹配的工作'
+    ]
+    
+    is_job_request = any(keyword in message_lower for keyword in job_request_keywords)
+    if is_job_request:
+        logger.info(f"🔍 Job query triggered: Job recommendation request with resume - '{message[:50]}...'")
+        return True
+    
+    # 3. 职位相关询问（但有简历的前提下）/ Job-related inquiries (with resume context)
+    job_inquiry_keywords = [
+        'job market', 'employment', 'career path', 'position',
+        '就业市场', '职业发展', '岗位', '职位'
+    ]
+    
+    is_job_inquiry = any(keyword in message_lower for keyword in job_inquiry_keywords)
+    if is_job_inquiry:
+        logger.info(f"🔍 Job query triggered: Job inquiry with resume context - '{message[:50]}...'")
+        return True
+    
+    logger.info(f"🚫 Job query NOT triggered: Has resume but no job-related request - '{message[:50]}...'")
+    return False
+
+def _should_trigger_skill_heatmap(message: str, context: Dict[Any, Any]) -> bool:
+    """
+    判断是否应该触发技能热点图生成 / Determine if skill heatmap generation should be triggered
+    根据README要求：使用Claude 4原生WebSearch搜索岗位热点技能并进行深度思考，然后调用Artifacts工具生成技能热点图
+    """
+    message_lower = message.lower()
+    
+    # 技能热点图相关关键词 / Skill heatmap related keywords (多语言支持)
+    heatmap_keywords = [
+        # 英文
+        'skills heatmap', 'skill heatmap', 'generate heatmap', 'show heatmap',
+        'skill map', 'skills analysis', 'trending skills', 'hot skills',
+        'skills visualization', 'skill trends', 'skills chart',
+        # 中文
+        '技能热点图', '技能热力图', '技能地图', '生成热点图', '显示热点图',
+        '技能分析', '热门技能', '技能趋势', '技能图表', '能力图谱',
+        # 德语 / German
+        'fähigkeiten heatmap', 'skill-heatmap', 'kompetenz karte',
+        'trending fähigkeiten', 'beliebte skills'
+    ]
+    
+    # 检查是否包含技能热点图关键词 / Check for heatmap keywords
+    has_heatmap_keywords = any(keyword in message_lower for keyword in heatmap_keywords)
+    
+    # 检查上下文中是否有明确的热点图请求 / Check context for explicit heatmap request
+    force_heatmap = context.get('force_skill_heatmap', False)
+    
+    # 检查是否是职位+技能分析的复合请求 / Check for job+skill analysis combined request
+    job_skill_patterns = [
+        'skills for', 'skills needed for', 'what skills', 'required skills',
+        '需要什么技能', '所需技能', '技能要求'
+    ]
+    has_job_skill_request = any(pattern in message_lower for pattern in job_skill_patterns)
+    
+    should_trigger = (
+        has_heatmap_keywords or 
+        force_heatmap or
+        (has_job_skill_request and any(word in message_lower for word in ['developer', 'engineer', 'analyst', '开发', '工程师', '分析师']))
+    )
+    
+    logger.info(f"📊 Skill heatmap decision for '{message[:30]}...': "
+               f"heatmap_kw={has_heatmap_keywords}, force={force_heatmap}, "
+               f"job_skill={has_job_skill_request}, trigger={should_trigger}")
+    
+    return should_trigger
+
 @router.post("/unified")
 async def unified_chat(request: ChatRequest, http_request: Request = None):
     """
@@ -81,8 +198,20 @@ async def unified_chat(request: ChatRequest, http_request: Request = None):
                 context['resume_uploaded'] = True
                 logger.info(f"📄 Using legacy format for file: {uploaded_file.get('filename', 'unknown')}")
         
-        # 🔥 README步骤4：基于简历向量查询匹配职位 / README step 4: Query matching jobs based on resume vector
-        if http_request and hasattr(http_request, 'app'):
+        # 🔥 修复：只在特定场景下查询职位 / FIX: Only query jobs in specific scenarios
+        # 检查是否应该触发职位查询 / Check if job query should be triggered
+        should_query_jobs = _should_trigger_job_query(request.message, context)
+        
+        # 🔥 新增：检查是否应该触发技能热点图生成 / NEW: Check if skill heatmap should be triggered
+        should_generate_heatmap = _should_trigger_skill_heatmap(request.message, context)
+        
+        # 🔥 如果是技能热点图请求，设置专门的上下文 / If skill heatmap request, set special context
+        if should_generate_heatmap:
+            context['task_type'] = 'skill_heatmap_generation'
+            context['force_websearch'] = True
+            logger.info(f"📊 技能热点图请求检测到，设置专门上下文 for session {session_id}")
+        
+        if should_query_jobs and http_request and hasattr(http_request, 'app'):
             db_connections = http_request.app.state.db_connections
             if 'jobs_collection' in db_connections and 'resumes_collection' in db_connections and 'openai_client' in db_connections:
                 jobs_collection = db_connections['jobs_collection']
@@ -247,8 +376,11 @@ async def chat_message(request: ChatRequest, http_request: Request = None):
         # 🔥 准备上下文，包括简历向量查询 / Prepare context including resume vector query
         context = request.context or {}
         
-        # 🔥 README步骤4：基于简历向量查询匹配职位 / README step 4: Query matching jobs based on resume vector
-        if http_request and hasattr(http_request, 'app'):
+        # 🔥 修复：只在特定场景下查询职位 / FIX: Only query jobs in specific scenarios
+        # 检查是否应该触发职位查询 / Check if job query should be triggered
+        should_query_jobs = _should_trigger_job_query(request.message, context)
+        
+        if should_query_jobs and http_request and hasattr(http_request, 'app'):
             db_connections = http_request.app.state.db_connections
             if 'jobs_collection' in db_connections and 'resumes_collection' in db_connections and 'openai_client' in db_connections:
                 jobs_collection = db_connections['jobs_collection']
@@ -457,19 +589,24 @@ async def generate_skill_heatmap_standalone(job_title: str):
     """
     独立技能热点图端点 / Standalone skill heatmap endpoint
     向后兼容，建议使用统一聊天接口 / Backward compatibility, recommend using unified chat interface
+    🔥 修复：使用正确的方法调用 / FIXED: Use correct method call
     """
     try:
         logger.warning("Using deprecated standalone skill heatmap endpoint. Please use unified chat interface.")
         
         claude_service = get_claude_service()
         
-        # 直接调用工具 / Direct tool call
-        heatmap_data = await claude_service._tool_generate_skill_heatmap(job_title)
+        # 🔥 修复：使用正确的方法名 / FIXED: Use correct method name
+        heatmap_data = await claude_service.generate_skill_heatmap_data(job_title)
         
         return {
+            "success": heatmap_data.get("success", True),
             "heatmap_data": heatmap_data,
             "message_type": "skill_heatmap",
-            "job_title": job_title
+            "job_title": job_title,
+            "artifacts_generated": heatmap_data.get("artifacts_generated", False),
+            "interactive": heatmap_data.get("interactive", False),
+            "websearch_used": heatmap_data.get("websearch_used", False)
         }
         
     except Exception as e:
@@ -482,19 +619,21 @@ async def get_market_insights_standalone(query: str):
     """
     独立市场洞察端点 / Standalone market insights endpoint
     向后兼容，建议使用统一聊天接口 / Backward compatibility, recommend using unified chat interface
+    🔥 修复：使用正确的方法调用 / FIXED: Use correct method call
     """
     try:
         logger.warning("Using deprecated standalone market insights endpoint. Please use unified chat interface.")
         
         claude_service = get_claude_service()
         
-        # 直接调用工具 / Direct tool call
-        insights_data = await claude_service._tool_get_market_insights(query)
+        # 🔥 修复：使用正确的方法名 / FIXED: Use correct method name
+        insights_data = await claude_service.get_german_job_market_insights(query)
         
         return {
-            "insights": insights_data.get("content", ""),
+            "insights": insights_data,
             "message_type": "market_insights",
-            "query": query
+            "query": query,
+            "success": True
         }
         
     except Exception as e:

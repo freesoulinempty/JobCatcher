@@ -35,15 +35,15 @@ class SchedulerService:
         try:
             # 添加定时任务 / Add scheduled tasks
             try:
-                # 定时爬取任务：德国时间下午1.00点 / Scheduled crawling task: 13.00 PM German time
+                # 定时爬取任务：德国时间下午2.00点 / Scheduled crawling task: 14.00 PM German time  
                 self.scheduler.add_job(
                     self._scheduled_crawl_job,
-                    CronTrigger(hour=13, minute=0, timezone=self.german_tz),  # 德国时间下午1.00点 / 13.00 PM German time    
+                    CronTrigger(hour=14, minute=0, timezone=self.german_tz),  # 德国时间下午2.00点 / 14.00 PM German time    
                     id="daily_crawl",
                     name="Daily Job Crawling",
                     replace_existing=True
                 )
-                logger.info("✅ 定时爬取任务已设置：德国时间每天晚上1.00点 / Scheduled crawling task set: 13.00 PM German time daily")
+                logger.info("✅ 定时爬取任务已设置：德国时间每天下午2.00点 / Scheduled crawling task set: 14.00 PM German time daily")
                 
                 # 数据清理任务：德国时间下午12.00点 / Data cleanup task: 12.00 PM German time
                 self.scheduler.add_job(
@@ -63,7 +63,7 @@ class SchedulerService:
             current_german_time = datetime.now(self.german_tz)
             logger.info(f"Scheduler service started successfully")
             logger.info(f"Current German time: {current_german_time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
-            logger.info(f"Next crawl scheduled for: German time 13:00 daily")
+            logger.info(f"Next crawl scheduled for: German time 14:00 daily")
             logger.info(f"Next cleanup scheduled for: German time 12:00 daily")
             
         except Exception as e:
@@ -81,8 +81,8 @@ class SchedulerService:
     async def _scheduled_crawl_job(self):
         """
         定时爬取任务 / Scheduled crawling job
-        按照README要求：每日13.00点定时爬取预设岗位数据 / According to README: daily crawling at 13.00 for preset job titles
-        LinkedIn预设岗位: "engineer","manager","IT","Finance","Sales","Nurse","Consultant","software developer"
+        按照README要求：每日14.00点定时爬取预设岗位数据 / According to README: daily crawling at 14.00 for preset job titles
+        LinkedIn预设岗位: "engineer","manager","IT","Finance","Sales","Nurse","Consultant","software developer","python","java"
         Indeed预设岗位: "Web","cloud","AI","Data","software"
         """
         try:
