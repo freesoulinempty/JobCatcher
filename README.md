@@ -4,7 +4,11 @@
 
 JobCatcher 是一个基于Claude 4 Sonnet驱动的智能职位搜索和匹配平台，专注于德国就业市场，充分利用AI原生能力，最小化代码开发，全流程vibe coding使用cursor开发。
 
+（待完善：1.岗位推荐流程还有问题：不能在用户未要求的情况下推荐岗位 2.技能热点图：返回的应该是html渲染网页，而不是bot发送信息 3.岗位数量不够 4.token消耗过大）。
+
 JobCatcher is an AI-powered intelligent job search and matching platform driven by Claude 4 Sonnet, focused on the German job market, leveraging AI-native capabilities to minimize code development, vibe coding with Cursor.
+
+(To be improved: 1. There are still problems with the job recommendation process: jobs cannot be recommended without user request 2. Skills hotspot map: the returned content should be an HTML rendered web page, not information sent by the bot 3. The number of jobs is not enough 4. The token consumption is too high).
 
 ## 技术架构 / Technology Architecture
 
