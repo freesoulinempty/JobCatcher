@@ -1,4 +1,12 @@
+
+
 # JobCatcher 前后端开发文档 / JobCatcher Frontend & Backend Development Documentation
+
+
+
+https://github.com/user-attachments/assets/0b9e071a-aca8-42cc-8402-6af9eefdc7d6
+
+
 
 ## 项目概述 / Project Overview
 
