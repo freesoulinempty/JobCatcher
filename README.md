@@ -1,5 +1,9 @@
 # JobCatcher Frontend & Backend Development Documentation
 
+
+https://github.com/user-attachments/assets/4bf811ad-2bf0-4b8f-83f4-bf8b48df008f
+
+
 ## Project Overview
 
 JobCatcher is an AI-powered intelligent job search and matching platform driven by Claude 4 Sonnet, focused on the German job market, leveraging AI-native capabilities to minimize code development, vibe coding with Cursor.
