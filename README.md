@@ -1,10 +1,34 @@
+<<<<<<< HEAD
 # JobCatcher Frontend & Backend Development Documentation
 
 ## Project Overview
+=======
+
+
+# JobCatcher 前后端开发文档 / JobCatcher Frontend & Backend Development Documentation
+
+
+
+https://github.com/user-attachments/assets/0b9e071a-aca8-42cc-8402-6af9eefdc7d6
+
+
+
+## 项目概述 / Project Overview
+
+JobCatcher 是一个基于Claude 4 Sonnet驱动的智能职位搜索和匹配平台，专注于德国就业市场，充分利用AI原生能力，最小化代码开发，全流程vibe coding使用cursor开发。
+>>>>>>> 8d817c4cabd0ab6b7911e78dc2d407fcaab2cc63
+
+（待完善：1.岗位推荐流程：推荐岗位必须在用户要求下才能触发 2.技能热点图：返回的应该是html渲染网页，而不是bot发送信息 3.岗位数量不够 4.token消耗过大）。
 
 JobCatcher is an AI-powered intelligent job search and matching platform driven by Claude 4 Sonnet, focused on the German job market, leveraging AI-native capabilities to minimize code development, vibe coding with Cursor.
 
+<<<<<<< HEAD
 ## Technology Architecture
+=======
+(To be improved: 1. job recommendation process: jobs cannot be recommended without user request 2. Skills heatmap: the returned content should be an HTML rendered web page, not information sent by the bot 3. The number of jobs is not enough 4. The token consumption is too high).
+
+## 技术架构 / Technology Architecture
+>>>>>>> 8d817c4cabd0ab6b7911e78dc2d407fcaab2cc63
 
 ### Core AI Engine
 - **Claude 4 Sonnet** - Primary AI model
