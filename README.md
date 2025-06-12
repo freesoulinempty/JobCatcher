@@ -6,7 +6,6 @@ JobCatcher is an AI-powered intelligent job search and matching platform driven 
 (To be improved: 1. job recommendation process: jobs cannot be recommended without user request 2. Skills heatmap: the returned content should be an HTML rendered web page, not information sent by the bot 3. The number of jobs is not enough 4. The token consumption is too high).
 
 ## 技术架构 / Technology Architecture
->>>>>>> 8d817c4cabd0ab6b7911e78dc2d407fcaab2cc63
 
 ### Core AI Engine
 - **Claude 4 Sonnet** - Primary AI model
