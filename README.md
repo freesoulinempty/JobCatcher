@@ -1,4 +1,4 @@
-# JobCatcher 前后端开发文档 / JobCatcher Frontend & Backend Development Documentation
+# JobCatcher Frontend & Backend Development Documentation
 
 ## Project Overview
 
